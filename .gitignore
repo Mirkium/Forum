@@ -1,0 +1,34 @@
+# === Go Files ===
+/bin/
+/pkg/
+/*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Binaries
+*.out
+*.test
+
+# === Dependency Directories ===
+vendor/
+go.sum
+
+# === Env & Config Files ===
+.env
+*.local
+*.env.*
+
+# === IDE / Editor Specific ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log

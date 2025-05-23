@@ -9,24 +9,25 @@ func InitRoutes() {
     // Authentification
     http.HandleFunc("/forum/register", controller.Register)
     http.HandleFunc("/forum/login", controller.Login)
+    http.HandleFunc("/forum/connect", controller.Connect)
 
     // Threads
-    http.HandleFunc("/forum/threads", controller.ThreadsHandler)            // GET, POST
-    http.HandleFunc("/forum/thread/", controller.ThreadByIDHandler)         // GET, PUT, DELETE
+    http.HandleFunc("/forum/threads", controller.ThreadsHandler)            
+    http.HandleFunc("/forum/thread/", controller.ThreadByIDHandler)         
 
     // Messages
-    http.HandleFunc("/forum/thread/", controller.MessageHandler)            // POST (ajout de message)
-    http.HandleFunc("/forum/message/", controller.MessageByIDHandler)       // PUT, DELETE
+    http.HandleFunc("/forum/thread/", controller.MessageHandler)           
+    http.HandleFunc("/forum/message/", controller.MessageByIDHandler)       
 
     // Likes / Dislikes
-    http.HandleFunc("/forum/message/", controller.LikeDislikeHandler)       // POST pour like/dislike
+    http.HandleFunc("/forum/message/", controller.LikeDislikeHandler)      
 
     // Recherche & tags
     http.HandleFunc("/forum/search", controller.SearchThreads)
     http.HandleFunc("/forum/threads/tags/", controller.ThreadsByTag)
 
     // Admin
-    http.HandleFunc("/forum/admin/thread/", controller.AdminThreadHandler)  // PUT, DELETE
+    http.HandleFunc("/forum/admin/thread/", controller.AdminThreadHandler)  
     http.HandleFunc("/forum/admin/message/", controller.AdminDeleteMessage)
     http.HandleFunc("/forum/admin/ban/", controller.AdminBanUser)
 
