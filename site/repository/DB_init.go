@@ -1,4 +1,4 @@
-package controller
+package repository
 
 import (
 	"database/sql"
@@ -6,11 +6,16 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 )
 
+var DbContext *sql.DB
+
+//========================= ENV =========================
+
 func InitEnv() {
-	errEnv := godotenv.Load("../.env")
+	errEnv := godotenv.Load(".env")
 	if errEnv != nil {
 		fmt.Println(Red, "error .env : ", errEnv, Reset)
 		return
@@ -32,8 +37,9 @@ func InitEnv() {
 
 }
 
+//========================= DB =========================
 
-var DbContext *sql.DB
+//------------------ init ------------------
 
 func InitDB() {
 	user := GetEnvWithDefault("DB_USER", "")
@@ -47,13 +53,20 @@ func InitDB() {
 	}
 
 	connectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, pwd, host, port, name)
-
 	var err error
 	DbContext, err = sql.Open("mysql", connectionString)
 	if err != nil {
-		log.Fatalf(Red, "Erreur d’ouverture de la connexion : %v", err, Reset)
+		log.Fatalf(Red, "Erreur d'ouverture de la connexion : %v", err, Reset)
+	}
+
+	err = DbContext.Ping()
+	if err != nil {
+		DbContext.Close()
+		log.Fatalf(Red, "Fail ping to MySQL, error : %v", err, Reset)
 	}
 }
+
+
 
 func GetEnvWithDefault(key string, defaultValue string) string {
 	envVar, envErr := os.LookupEnv(key)

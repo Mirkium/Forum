@@ -1,0 +1,71 @@
+{{  define "topic" }}
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        {{template "header"}}
+        <div class="Topic">
+            <a href="/forum/topic/get_add">Create Topic</a>
+            {{if .Profil.IsConnect }}
+                <section class="topicSubscribe">
+                    <h2>Subscribe</h2>
+                    {{range .Profil.TopicLike}}
+                        <a href="/forum/topic?id={{.Id}}" class="LienTopic"><p><strong>{{.Name}}</strong>/{{.Category}}</p><p>{{.Followers}}</p></a>
+                    {{end}}
+                </section>
+            {{end}}
+            {{range .ListTopic}}
+                <a href="/forum/topic?id={{.Id}}" class="LienTopic"><p><strong>{{.Name}}</strong>/{{.Category}}</p><p>{{.Followers}}</p></a>
+            {{end}}
+        </div>
+        <div class="listThread">
+            <h1>{{.Topic.Name}}</h1>
+            <a href="/forum/topic/thread/get_add?id={{.Topic.Id}}" class="addThread">Add thread</a>
+
+            {{range .ListThread}}
+
+                <div class="thread">
+                    <div class="creator">
+                        <p>{{.NameCreator}}</p>
+                        <p>{{.TimeCreate}}</p>
+                    </div>
+                    <h2>{{.Title}}</h2>
+                    <p>{{.Content}}</p>
+
+                    <form action="/forum/thread/like?threadId={{.Id}}" method="post">
+                        <button>{{if .IsLike}}Unlike{{else}}Like{{end}}</button>
+                    </form>
+
+                    <div id="comments-{{.Id}}" style="display: none">
+                        <!-- Liste des commentaires -->
+                        {{range .Comment}}
+
+                            <div>{{.UserComment}} : {{.Content}}</div>
+
+                        {{end}}
+
+                        <form id="add-comment-{{.Id}}" action="/forum/thread/comment?threadId={{.Id}}" method="post" style="display: none">
+                            <input name="comment" placeholder="Votre commentaire">
+                            <button type="submit">Publish</button>
+                        </form>
+
+                    </div>
+
+                </div>
+
+            {{end}}
+
+        </div>
+        
+        <script src="/assets/js/topic.js" async defer></script>
+    </body>
+</html>
+{{end}}

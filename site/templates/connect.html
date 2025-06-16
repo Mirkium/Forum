@@ -1,20 +1,54 @@
+{{define "connect"}}
 <!DOCTYPE html>
 
 <html>
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
+        <title>YForum - connect</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="/assets/css/connect.css">
-        <link rel="stylesheet" href="/assets/css/header.css">
-        <link rel="stylesheet" href="/assets/css/footer.css">
-        <link rel="stylesheet" href="/assets/css/message.css">
     </head>
     <body>
+        <main id="form-container">
+            <div class="login">
+            <h1>Login</h1>
+            <form action="/forum/login" method="post" id="loginForm">
+                {{if .IsLogin}}
+                    {{if .ValueError }}
+                        <p class="error">Error with username or password !</p>
+                    {{end}}
+                {{end}}
+                <label for="Username">Username :</label>
+                <input type="text" name="Username" id="loginUsername" placeholder="Username..." required>
+                <label for="loginPassword">Password :</label>
+                <input type="password" name="password" id="loginPassword" required>
+                <button type="submit">Login</button>
+            </form>
+            <button class="switch-btn" id="to-register">Don't have an account? Register</button>
+            </div>
+
+            <div class="register">
+            <h1>Register</h1>
+            <form action="/forum/register" method="post" id="registerForm">
+                {{if .IsLogin }}
+                    {{if .ValueError }}
+                        <p class="error">Error with username or password !</p>
+                    {{end}}
+                {{end}}
+                <label for="registerUsername">Username :</label>
+                <input type="text" name="Username" id="registerUsername" placeholder="Username..." required>
+                <label for="registerPassword">Password :</label>
+                <input type="password" name="password" id="registerPassword" required>
+                <button type="submit">Register</button>
+            </form>
+            <button class="switch-btn" id="to-login">Login</button>
+            </div>
+        </main>
         
         
-        <script src="" async defer></script>
+        <script src="/assets/js/connect.js" async defer></script>
     </body>
 </html>
+{{end}}
