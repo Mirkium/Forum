@@ -3,10 +3,13 @@ package main
 import (
 	"log"
 	"net/http"
+	//"github.com/gorilla/sessions"
 	controller "server/controller"
 	repository "server/repository"
 	routes "server/route"
 )
+
+//var Store = sessions.NewCookieStore([]byte("clé-secrète-super-secrète"))
 
 func main() {
 

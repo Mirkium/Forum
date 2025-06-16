@@ -29,7 +29,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/forum/connect", http.StatusSeeOther)
 		return
 	}
-	UserConnect = *user
+	http.SetCookie(w, &http.Cookie{
+		Name:     "user_id",
+		Value:    strconv.Itoa(user.Id),
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   3600,
+	})
 	UserConnect.IsConnect = true
 	http.Redirect(w, r, "/forum/home", http.StatusSeeOther)
 }
@@ -99,12 +105,6 @@ func AddThread_Post(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 		fmt.Println(Red, "error method post, type method : ", r.Method, Reset)
-		http.Redirect(w, r, fmt.Sprintf("/forum/topic?id=%d", TopicID), http.StatusSeeOther)
-		return
-	}
-
-	if !UserConnect.IsConnect {
-		http.Redirect(w, r, "/forum/login", http.StatusSeeOther)
 		return
 	}
 
@@ -118,7 +118,7 @@ func AddThread_Post(w http.ResponseWriter, r *http.Request) {
 	NewThread.Content = r.FormValue("content")
 	NewThread.Description = r.FormValue("description")
 
-	threadId, err := DB.AddThread(TopicID, NewThread.Title, NewThread.Content, NewThread.Description, UserConnect.Id)
+	threadId, err := DB.AddThread(NewTopic.Id, NewThread.Title, NewThread.Content, NewThread.Description, UserConnect.Id)
 	if err != nil {
 		http.Error(w, "Erreur lors de l'ajout du thread", http.StatusInternalServerError)
 		fmt.Println(Red, "error : ", err, Reset)
@@ -126,6 +126,32 @@ func AddThread_Post(w http.ResponseWriter, r *http.Request) {
 	}
 	NewThread.Id = int(threadId)
 
-	http.Redirect(w, r, fmt.Sprintf("/forum/topic?id=%d", TopicID), http.StatusSeeOther)
+	http.Redirect(w, r, "/forum/topic?id="+strconv.Itoa(NewTopic.Id), http.StatusSeeOther)
+
+}
+
+func LikeThreadHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		threadIdStr := r.URL.Query().Get("threadId")
+		threadId, err := strconv.Atoi(threadIdStr)
+		if err != nil {
+			http.Error(w, "Invalid thread ID", http.StatusBadRequest)
+			return
+		}
+
+		userId := UserConnect.Id
+		liked := DB.CheckLike(userId, threadId)
+
+		if liked {
+			DB.RemoveLike(userId, threadId)
+		} else {
+			DB.AddLike(userId, threadId)
+		}
+
+		http.Redirect(w, r, fmt.Sprintf("/forum/topic?id=%d", UserConnect.Id), http.StatusSeeOther)
+	}
+}
+
+func FollowUser(w http.ResponseWriter, r *http.Request) {
 
 }

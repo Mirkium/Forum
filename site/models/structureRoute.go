@@ -16,8 +16,14 @@ type TopicPage struct {
 
 type AddTopic_tag struct {
 	ListTag []Tag
+	Profil  User
 }
 
 type AddTopic_Thread struct {
 	TopicId int
+	Profil  User
+}
+
+type Profil_Page struct {
+	Profil User
 }

@@ -104,17 +104,18 @@ func RecupThreadsByTopicID(topicId int, userId int) []models.Thread {
 	query := `
 		SELECT 
 			t.id, t.name, t.description, t.content, t.nb_like, t.nb_dislike, t.created_at,
-			u.username,
+			u.username, tp.name AS topic_name,
 			COALESCE(tl.is_like, 0) AS is_liked
 		FROM threads t
 		JOIN users u ON u.id = t.author_id
+		JOIN topics tp ON tp.id = t.topic_id
 		LEFT JOIN thread_likes tl ON t.id = tl.thread_id AND tl.user_id = ?
 		WHERE t.topic_id = ?
 	`
 
 	rows, err := DbContext.Query(query, userId, topicId)
 	if err != nil {
-		fmt.Println("Erreur récupération des threads :", err.Error())
+		fmt.Println("Erreur récupération des threads :", err.Error()) 
 		return nil
 	}
 	defer rows.Close()
@@ -128,18 +129,17 @@ func RecupThreadsByTopicID(topicId int, userId int) []models.Thread {
 		err := rows.Scan(
 			&th.Id, &th.Title, &th.Description, &th.Content,
 			&th.NbLike, &th.NbDisLike, &createdAtStr,
-			&th.NameCreator, &isLike,
+			&th.NameCreator, &th.NameTopic, &isLike,
 		)
 		if err != nil {
-			fmt.Println("Erreur scan thread :", err.Error())
+			fmt.Println("Erreur scan thread :", err.Error()) 
 			continue
 		}
 
 		parsedTime, err := time.Parse("2006-01-02 15:04:05", createdAtStr)
 		if err != nil {
-			fmt.Println("Erreur parse created_at :", err.Error())
+			fmt.Println("Erreur parse created_at :", err.Error()) 
 		} else {
-			// On garde le décalage en heures, minutes...
 			duration := time.Since(parsedTime)
 			th.TimeCreate = fmt.Sprintf("%v ago", duration.Round(time.Minute))
 		}
@@ -155,9 +155,10 @@ func RecupAllThreadsByDateDesc() ([]models.Thread, error) {
 	query := `
 		SELECT 
 			t.id, t.name, t.description, t.content, t.nb_like, t.nb_dislike, t.created_at,
-			u.username
+			u.username, tp.name AS topic_name
 		FROM threads t
 		JOIN users u ON u.id = t.author_id
+		JOIN topics tp ON tp.id = t.topic_id
 		ORDER BY t.created_at DESC
 	`
 
@@ -175,7 +176,7 @@ func RecupAllThreadsByDateDesc() ([]models.Thread, error) {
 		err := rows.Scan(
 			&th.Id, &th.Title, &th.Description, &th.Content,
 			&th.NbLike, &th.NbDisLike, &createdAtStr,
-			&th.NameCreator,
+			&th.NameCreator, &th.NameTopic,
 		)
 		if err != nil {
 			fmt.Println("Erreur scan thread :", err.Error()) 
@@ -201,7 +202,8 @@ func RecupAllThreadsByDateDesc() ([]models.Thread, error) {
 }
 
 
-//------------------ récupération des tags ------------------
+
+// ------------------ récupération des tags ------------------
 
 func RecupTags() []models.Tag {
 	query := `SELECT id, name FROM categories ORDER BY name ASC;`
@@ -294,3 +296,138 @@ func RemoveLike(userId, threadId int) error {
 	_, err := DbContext.Exec("DELETE FROM thread_likes WHERE user_id = ? AND thread_id = ?", userId, threadId)
 	return err
 }
+
+
+// ------------------ Récupération utilisateur ------------------
+
+func GetUserByID(id int) (models.User, error) {
+	query := `
+		SELECT id, username, password_hash, role, banned, is_connect,followers, is_follow
+		FROM users
+		WHERE id = ?
+	`
+
+	var user models.User
+	var banned, isConnect, isFollow int
+
+	err := DbContext.QueryRow(query, id).Scan(
+		&user.Id, &user.Username, &user.Password,
+		&user.Role, &banned, &isConnect, &user.Followers, &isFollow,
+	)
+
+	if err != nil {
+		return user, fmt.Errorf("Erreur lors de la récupération de l'utilisateur : %v", err)
+	}
+
+	user.Banned = banned == 1
+	user.IsConnect = isConnect == 1
+	user.IsFollow = isFollow == 1
+
+	// Récupération des topics follow
+	topicQuery := `
+		SELECT t.id, t.name, c.name AS category, t.followers
+		FROM topic_subscriptions ts
+		JOIN topics t ON ts.topic_id = t.id
+		JOIN categories c ON t.category_id = c.id
+		WHERE ts.is_subscribed = 1 AND ts.user_id = ?
+	`
+
+	rows, err := DbContext.Query(topicQuery, id)
+	if err != nil {
+		fmt.Println("Erreur lors de la récupération des topics :", err)
+		// On garde simplement une liste vide
+		user.TopicLike = []models.Topic{}
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			var topic models.Topic
+			if err := rows.Scan(&topic.Id, &topic.Name, &topic.Category, &topic.Followers); err != nil {
+				fmt.Println("Erreur lors du scan d'un topic :", err)
+				continue
+			}
+			topic.IsSubscribe = true
+			user.TopicLike = append(user.TopicLike, topic)
+		}
+	}
+
+	// ThreadLike, Friends, Subscribe, Post seront vides par défaut
+	// A lancer d’autres méthodes si besoin
+
+	return user, nil
+}
+func GetUserByUsername(username string) (models.User, error) {
+	query := `
+		SELECT id, username, password_hash, role, banned, is_connect,followers, is_follow
+		FROM users
+		WHERE username = ?
+	`
+
+	var user models.User
+	var banned, isConnect, isFollow int
+
+	err := DbContext.QueryRow(query, username).Scan(
+		&user.Id, &user.Username, &user.Password,
+		&user.Role, &banned, &isConnect, &user.Followers, &isFollow,
+	)
+
+	if err != nil {
+		return user, fmt.Errorf("Erreur lors de la récupération de l'utilisateur : %v", err)
+	}
+
+	user.Banned = banned == 1
+	user.IsConnect = isConnect == 1
+	user.IsFollow = isFollow == 1
+
+	// Récupération des topics follow
+	topicQuery := `
+		SELECT t.id, t.name, c.name AS category, t.followers
+		FROM topic_subscriptions ts
+		JOIN topics t ON ts.topic_id = t.id
+		JOIN categories c ON t.category_id = c.id
+		WHERE ts.is_subscribed = 1 AND ts.user_id = ?
+	`
+
+	rows, err := DbContext.Query(topicQuery, user.Id)
+	if err != nil {
+		fmt.Println("Erreur lors de la récupération des topics :", err)
+		user.TopicLike = []models.Topic{}
+	} else {
+		defer rows.Close()
+		for rows.Next() {
+			var topic models.Topic
+			if err := rows.Scan(&topic.Id, &topic.Name, &topic.Category, &topic.Followers); err != nil {
+				fmt.Println("Erreur lors du scan d'un topic :", err)
+				continue
+			}
+			topic.IsSubscribe = true
+			user.TopicLike = append(user.TopicLike, topic)
+		}
+	}
+
+	// ThreadLike, Friends, Subscribe, Post seront vides par défaut
+	// A lancer d’autres méthodes si besoin
+
+	return user, nil
+}
+
+
+
+func GetTopicByName(name string) (models.Topic, error) {
+	var topic models.Topic
+
+	query := `SELECT id, name, followers FROM topics WHERE name = ? LIMIT 1`
+
+	row := DbContext.QueryRow(query, name)
+
+	if err := row.Scan(&topic.Id, &topic.Name, &topic.Followers); err != nil {
+		return topic, fmt.Errorf("Erreur lors de la récupération du topic '%s': %v", name, err)
+	}
+
+	// tu peux lancer d’autres recherches, par ex. récupérer les threads liés
+	// ou le suivi de l’utilisateur.
+
+	return topic, nil
+}
+
+
+

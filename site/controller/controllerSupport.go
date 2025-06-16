@@ -27,6 +27,10 @@ var structAddTopic models.AddTopic_tag
 
 func ReloadHome() *models.Home {
 	var err error
+	UserConnect, err = repository.GetUserByID(UserConnect.Id)
+	if err != nil {
+		fmt.Println(Red, "Error with user ID, error : ", err, Reset)
+	} 
 	structHome.Profil = UserConnect
 	structHome.ListTopic = repository.RecupTopics(structHome.Profil.Id)
 	structHome.ListTag = repository.RecupTags()

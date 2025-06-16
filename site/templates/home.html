@@ -9,11 +9,31 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="/assets/css/home.css">
+        <link rel="stylesheet" href="/assets/css/ListTopic.css">
         <link rel="stylesheet" href="/assets/css/footer.css">
-        <link rel="stylesheet" href="/assets/css/message.css">
+        <link rel="stylesheet" href="/assets/css/thread.css">
+        <link rel="stylesheet" href="/assets/css/header.css">
     </head>
     <body>
-        {{template "header"}}
+        <header>
+            <a href="/forum/home" id="title">YForum</a>
+            <form action="/search" class="search">
+                <input type="text" placeholder="Search...">
+                <button type="submit">
+                    <img src="data:image/svg+xml;utf8,&lt;svg fill=&quot;white&quot; height=&quot;16&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;16&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;&lt;path d=&quot;M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z&quot;/&gt;&lt;/svg&gt;" alt="">
+                </button>
+
+            </form>
+            <div class="login">
+                {{if .Profil.IsConnect}}
+                    <a href="/logout" class="signIn">Logout</a>
+                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">{{.Profil.Username}}</a>
+                {{else}}
+                    <a href="/forum/connect" class="signIn">Connect</a>
+                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">Profil</a>
+                {{end}}
+            </div>
+        </header>
 
         <main>
             <div class="Topic">
@@ -34,36 +54,39 @@
                 {{range .Post}}
                     <div  class="Thread">
                         <div class="creator">
-                            <a href="/forum/thread?id={{.Id}}">{{.NameCreator}}</a>
+                            <a href="/forum/user?name={{.NameCreator}}"><strong>{{.NameCreator}}</strong></a>
+                            <a href="/forum/topic?name={{.NameTopic}}">/{{.NameTopic}}</a>
                             <p>{{.TimeCreate}}</p>
                         </div>
                         <h2>{{.Title}}</h2>
                         <p>{{.Content}}</p>
 
-                        <form action="/forum/thread/like?threadId={{.Id}}" method="post">
-                            <button>{{if .IsLike}}Unlike{{else}}Like{{end}}</button>
-                        </form>
-
-                        <div id="comments-{{.Id}}" style="display: none">
+                        <div class="option">
+                            <button onclick="seeComments(this)" class="commentsButton">Comments</button>
+                            <form action="/forum/thread/like?threadId={{.Id}}" method="post">
+                                <button class="like">{{if .IsLike}}Unlike{{else}}Like{{end}}</button>
+                            </form>
+                            <p class="nbLike">{{.NbLike}}</p>
+                            <p class="nbDislike">{{.NbDisLike}}</p>
+                        </div>
+                        <div class="comments" style="display: none">
+                            <form id="add-comment-{{.Id}}" action="/forum/thread/comment?threadId={{.Id}}" method="post" style="display: none">
+                                <input name="comment" placeholder="Votre commentaire">
+                                <button type="submit">Publish</button>
+                            </form>
                             <!-- Liste des commentaires -->
                             {{range .Comment}}
 
                                 <div>{{.UserComment}} : {{.Content}}</div>
 
                             {{end}}
-
-                            <form id="add-comment-{{.Id}}" action="/forum/thread/comment?threadId={{.Id}}" method="post" style="display: none">
-                                <input name="comment" placeholder="Votre commentaire">
-                                <button type="submit">Publish</button>
-                            </form>
-
                         </div>
                     </div>
                 {{end}}
             </div>
         </main>
         
-        <script src="" async defer></script>
+        <script src="/assets/js/comment.js" async defer></script>
     </body>
 </html>
 {{end}}

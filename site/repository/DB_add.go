@@ -129,7 +129,7 @@ func AjouterCommentaire(threadID int, userID int, content string) error {
 	return err
 }
 
-//------------------ ajouter un thread ------------------
+// ------------------ ajouter un thread ------------------
 
 func AddThread(idTopic int, name string, content string, description string, authorId int) (int64, error) {
 	query := ` INSERT INTO threads (name, content, description, topic_id, author_id, created_at) VALUES(?, ?, ?, ?, ?, NOW()) `
@@ -144,4 +144,40 @@ func AddThread(idTopic int, name string, content string, description string, aut
 	}
 
 	return id, nil
+}
+
+// ------------------ Follow un topic ------------------
+
+func FollowTopic(userId, topicId int) error {
+	query := `INSERT INTO topic_subscriptions (user_id, topic_id, is_subscribed) VALUES (?, ?, 1)`
+	_, err := DbContext.Exec(query, userId, topicId)
+	if err != nil {
+		return fmt.Errorf("Erreur lors de l'ajout de l'abonnement : %v", err)
+	}
+
+	// On peut en profiter pour incrémenter le nombre de Followers
+	_, err = DbContext.Exec("UPDATE topics SET followers = followers + 1 WHERE id = ?", topicId)
+	if err != nil {
+		return fmt.Errorf("Erreur lors de la mise à jour du nombre de Followers : %v", err)
+	}
+
+	return nil
+}
+
+// ------------------ UnFollow un topic ------------------
+
+func UnfollowTopic(userId, topicId int) error {
+	query := `DELETE FROM topic_subscriptions WHERE user_id = ? AND topic_id = ?`
+	_, err := DbContext.Exec(query, userId, topicId)
+	if err != nil {
+		return fmt.Errorf("Erreur lors de la suppression de l'abonnement : %v", err)
+	}
+
+	// On peut en profiter pour décrémenter le nombre de Followers
+	_, err = DbContext.Exec("UPDATE topics SET followers = GREATEST(followers - 1, 0) WHERE id = ?", topicId)
+	if err != nil {
+		return fmt.Errorf("Erreur lors de la mise à jour du nombre de Followers : %v", err)
+	}
+
+	return nil
 }

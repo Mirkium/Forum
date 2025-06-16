@@ -8,18 +8,37 @@
         <title>YForum - Post thread</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="/assets/css/header.css">
         <link rel="stylesheet" href="/assets/css/addThread.css">
     </head>
     <body>
-        {{template "header"}}
-        <form action="/forum/topic/thread/post_add/?id={{.TopicId}}" method="post">
-            <label for="title">Title :</label>
+        <header>
+            <a href="/forum/home" id="title">YForum</a>
+            <form action="/search" class="search">
+                <input type="text" placeholder="Search...">
+                <button type="submit">
+                    <img src="data:image/svg+xml;utf8,&lt;svg fill=&quot;white&quot; height=&quot;16&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;16&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;&lt;path d=&quot;M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z&quot;/&gt;&lt;/svg&gt;" alt="">
+                </button>
+
+            </form>
+            <div class="login">
+                <a href="/forum/connect" class="signIn">Connect</a>
+                {{if .Profil.IsConnect}}
+                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">{{.Profil.Username}}</a>
+                {{else}}
+                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">Profil</a>
+                {{end}}
+                
+            </div>
+        </header>
+        <form action="/forum/topic/thread/post_add" method="POST" class="formThread">
+            <label for="title" class="labelThread">Title :</label>
             <input type="text" name="title" id="titleInput">
-            <label for="content">Content :</label>
+            <label for="content" class="labelThread">Content :</label>
             <input type="text" name="content" id="contentInput">
-            <label for="description">Description :</label>
+            <label for="description" class="labelThread">Description :</label>
             <input type="text" name="description" id="descriptionInput">
-            <button type="submit">Post</button>
+            <button type="submit" class="submitThread">Post</button>
         </form>
 
         <script src="" async defer></script>

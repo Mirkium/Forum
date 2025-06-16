@@ -28,6 +28,7 @@ type Thread struct {
 	NameCreator string
 	Description string
 	Content     string
+	NameTopic   string
 	NbLike      int
 	NbDisLike   int
 	Comment     []Comment

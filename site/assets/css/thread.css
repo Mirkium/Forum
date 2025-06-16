@@ -1,0 +1,167 @@
+main {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    box-sizing: border-box;
+    background: #edf5ff;
+    min-height: 100vh;
+}
+
+.NewThread {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 20px;
+    padding: 1%;
+}
+
+.Thread {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px #0002;
+    padding: 20px;
+    width: 70%;
+    transition: all 0.2s ease-in-out;
+}
+
+.Thread:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px #0003;
+}
+
+.creator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #555;
+}
+
+.creator > a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: color 0.2s ease-in-out;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.creator > a:hover {
+    color: #0056b3;
+}
+
+.creator > p {
+    color: #888;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.Thread h2 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
+.Thread p {
+    font-size: 1em;
+    line-height: 1.5;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.like {
+    border-radius: 10px;
+    padding: 5px 10px;
+    border: none;
+    background: #edf5ff;
+    color: #007bff;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.like:hover {
+    background: #d9edf9;
+    color: #0056b3;
+}
+
+.nbLike {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.nbDislike {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.commentsButton {
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+    font-weight: 500;
+}
+
+.commentsButton:hover {
+    color: #ffcc5b;
+}
+
+.comments {
+    margin-top: 15px;
+    padding: 15px;
+    background: #edf5ff;
+    border-radius: 10px;
+}
+
+.comments form {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.comments form input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #ffffff;
+}
+
+.comments form button {
+    padding: 8px 12px;
+    background: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+}
+
+.comments form button:hover {
+    background: #0056b3;
+}
+
+.comments div {
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px #0002;
+}
+
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+    }
+}

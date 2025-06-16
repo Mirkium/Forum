@@ -1,0 +1,48 @@
+.Topic {
+    flex: 0 0 250px;
+    background: #ffffff;
+    padding: 20px;
+    box-shadow: 0 2px 5px #0002;
+    height: 100vh;
+    border-right: 2px solid #000;
+    padding-right: 2%;
+}
+
+.Topic > a {
+    color: black;
+    padding: 10px;
+    width: 100%;
+    display: block;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+    text-decoration: none;
+    background: #edf5ff;
+    font-weight: 500;
+}
+
+.Topic > a:hover {
+    background: #d9edf9;
+    transform: translateX(5px);
+}
+
+.LienTopic {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topicSubscribe {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #edf5ff;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .Topic {
+        max-width: 100%;
+    }
+}
