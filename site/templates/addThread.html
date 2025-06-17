@@ -22,13 +22,13 @@
 
             </form>
             <div class="login">
-                <a href="/forum/connect" class="signIn">Connect</a>
-                {{if .Profil.IsConnect}}
-                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">{{.Profil.Username}}</a>
+                {{if eq .Profil.IsConnect true}}
+                    <a href="/logout" class="signIn">Logout</a>
+                    <a href="/forum/user" class="profil">{{.Profil.Username}}</a>
                 {{else}}
-                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">Profil</a>
+                    <a href="/forum/connect" class="signIn">Connect</a>
+                    <a href="/forum/user" class="profil">Profil</a>
                 {{end}}
-                
             </div>
         </header>
         <form action="/forum/topic/thread/post_add" method="POST" class="formThread">

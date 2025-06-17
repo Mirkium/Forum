@@ -28,7 +28,9 @@ func InitRoutes() {
 	http.HandleFunc("/forum/topic/thread/post_add", controller.AddThread_Post)
 
 	// Likes
-	http.HandleFunc("/forum/thread/like", controller.LikeThreadHandler)
+	http.HandleFunc("/forum/thread/like/", controller.LikeThreadHandler)
+	http.HandleFunc("/forum/thread/unlike/", controller.LikeThreadHandler)
+	http.HandleFunc("/forum/topic/thread/like/", controller.LikeThreadTopic)
 
 	// Tag
 	http.HandleFunc("/forum/tag/get_add", controller.AddTag_get)

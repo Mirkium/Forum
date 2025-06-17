@@ -25,12 +25,12 @@
 
             </form>
             <div class="login">
-                {{if .Profil.IsConnect}}
+                {{if eq .Profil.IsConnect true}}
                     <a href="/logout" class="signIn">Logout</a>
-                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">{{.Profil.Username}}</a>
+                    <a href="/forum/user" class="profil">{{.Profil.Username}}</a>
                 {{else}}
                     <a href="/forum/connect" class="signIn">Connect</a>
-                    <a href="/forum/user?id={{.Profil.Id}}" class="profil">Profil</a>
+                    <a href="/forum/user" class="profil">Profil</a>
                 {{end}}
             </div>
         </header>
@@ -55,7 +55,7 @@
                     <div  class="Thread">
                         <div class="creator">
                             <a href="/forum/user?name={{.NameCreator}}"><strong>{{.NameCreator}}</strong></a>
-                            <a href="/forum/topic?name={{.NameTopic}}">/{{.NameTopic}}</a>
+                            <a href="/forum/topic/name/?name={{.NameTopic}}">/{{.NameTopic}}</a>
                             <p>{{.TimeCreate}}</p>
                         </div>
                         <h2>{{.Title}}</h2>
@@ -63,14 +63,17 @@
 
                         <div class="option">
                             <button onclick="seeComments(this)" class="commentsButton">Comments</button>
-                            <form action="/forum/thread/like?threadId={{.Id}}" method="post">
-                                <button class="like">{{if .IsLike}}Unlike{{else}}Like{{end}}</button>
-                            </form>
+                            {{if .IsLike}}
+                                <a href="/forum/thread/unlike?id={{.Id}}" class="like">Unlike</a>
+                            {{else}}
+                                <a href="/forum/thread/like?id={{.Id}}" class="like">Like</a>
+                            {{end}}
                             <p class="nbLike">{{.NbLike}}</p>
                             <p class="nbDislike">{{.NbDisLike}}</p>
                         </div>
                         <div class="comments" style="display: none">
-                            <form id="add-comment-{{.Id}}" action="/forum/thread/comment?threadId={{.Id}}" method="post" style="display: none">
+                            <form id="add-comment" action="/forum/thread/comment" method="post" style="display: none">
+                                <label for="comment">Comment</label>
                                 <input name="comment" placeholder="Votre commentaire">
                                 <button type="submit">Publish</button>
                             </form>

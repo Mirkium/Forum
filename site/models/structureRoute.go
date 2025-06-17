@@ -25,5 +25,6 @@ type AddTopic_Thread struct {
 }
 
 type Profil_Page struct {
-	Profil User
+	Profil    User
+	ListTopic []Topic
 }

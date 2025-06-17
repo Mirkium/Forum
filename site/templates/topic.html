@@ -8,7 +8,7 @@
         <title>YForum - {{.Topic.Name}}</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
+        <link rel="stylesheet" href="/assets/css/topic.css">
         <link rel="stylesheet" href="/assets/css/header.css">
         <link rel="stylesheet" href="/assets/css/ListTopic.css">
         <link rel="stylesheet" href="/assets/css/thread.css">
@@ -24,8 +24,13 @@
 
             </form>
             <div class="login">
-                <a href="/forum/connect" class="signIn">Connect</a>
-                <a href="/forum/user?id={{.Profil.Id}}" class="profil">Profil</a>
+                {{if eq .Profil.IsConnect true}}
+                    <a href="/logout" class="signIn">Logout</a>
+                    <a href="/forum/user" class="profil">{{.Profil.Username}}</a>
+                {{else}}
+                    <a href="/forum/connect" class="signIn">Connect</a>
+                    <a href="/forum/user" class="profil">Profil</a>
+                {{end}}
             </div>
         </header>
         <main>
@@ -46,20 +51,20 @@
             </div>
             <div class="NewThread">
                 <div class="optionTopic">
-                    <a href="/forum/topic/thread/get_add?id={{.Topic.Id}}">Add Post</a>
-                    <p class="nbFollowers">{{.Topic.Followers}}</p>
                     {{if .Topic.IsSubscribe}}
-                        <a href="/forum/topic/unfollow?id={{.Topic.Id}}">Unfollow</a>
+                        <a href="/forum/topic/unfollow?id={{.Topic.Id}}" class="follow">Unfollow</a>
                     {{else}}
-                        <a href="/forum/topic/follow?id={{.Topic.Id}}">Follow</a>
+                        <a href="/forum/topic/follow?id={{.Topic.Id}}" class="follow">Follow</a>
                     {{end}}
+                    <p class="nbFollowers">Followers : {{.Topic.Followers}}</p>
+                    <a href="/forum/topic/thread/get_add?id={{.Topic.Id}}" class="addPost">Add Post</a>
                     
                 </div>
                 {{range .ListThread}}
                     <div  class="Thread">
                         <div class="creator">
                             <a href="/forum/user?name={{.NameCreator}}"><strong>{{.NameCreator}}</strong></a>
-                            <a href="/forum/topic?name={{.NameTopic}}">/{{.NameTopic}}</a>
+                            <a href="/forum/topic/name?name={{.NameTopic}}">/{{.NameTopic}}</a>
                             <p>{{.TimeCreate}}</p>
                         </div>
                         <h2>{{.Title}}</h2>
@@ -67,14 +72,17 @@
 
                         <div class="option">
                             <button onclick="seeComments(this)" class="commentsButton">Comments</button>
-                            <form action="/forum/thread/like?threadId={{.Id}}" method="post">
-                                <button class="like">{{if .IsLike}}Unlike{{else}}Like{{end}}</button>
-                            </form>
+                            {{if .IsLike}}
+                                <a href="/forum/topic/thread/unlike?id={{.Id}}" class="like">Unlike</a>
+                            {{else}}
+                                <a href="/forum/topic/thread/like?id={{.Id}}" class="like">Like</a>
+                            {{end}}
                             <p class="nbLike">{{.NbLike}}</p>
                             <p class="nbDislike">{{.NbDisLike}}</p>
                         </div>
                         <div class="comments" style="display: none">
-                            <form id="add-comment-{{.Id}}" action="/forum/thread/comment?threadId={{.Id}}" method="post" style="display: none">
+                            <form id="add-comment" action="/forum/thread/comment" method="post" style="display: none">
+                                <label for="comment">Comment</label>
                                 <input name="comment" placeholder="Votre commentaire">
                                 <button type="submit">Publish</button>
                             </form>

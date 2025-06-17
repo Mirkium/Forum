@@ -1,69 +1,78 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
-
 body {
-    background-color: #121212;
-    color: #e0e0e0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    background: #edf5ff;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #333;
 }
 
 main {
-    width: 360px;
-    padding: 2rem;
-    border-radius: 12px;
-    background-color: #1e1e1e;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    min-height: 80vh;
+    box-sizing: border-box;
 }
 
-form {
+.formTopic {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px #0002;
+    padding: 30px;
+    width: 400px;
     display: flex;
     flex-direction: column;
+    gap: 20px;
+    transition: all 0.2s ease-in-out;
 }
 
-label {
-    font-size: 0.95rem;
-    margin-bottom: 0.3rem;
-    margin-top: 1rem;
-    color: #b0b0b0;
+.formTopic:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px #0003;
 }
 
-input, select {
-    width: 100%;
-    padding: 0.6rem;
-    background: #2a2a2a;
-    border: 1px solid #444;
-    color: #fff;
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: border 0.2s ease;
+.formTopic label {
+    color: #555;
+    font-weight: 500;
+    margin-bottom: 5px;
 }
 
-input:focus, select:focus {
-    border-color: #3498db;
+.formTopic input,
+.formTopic select {
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+.formTopic input:focus,
+.formTopic select:focus {
     outline: none;
+    border: 1px solid #007bff;
+    box-shadow: 0 0 5px #007bff;
 }
 
-button {
-    margin-top: 2rem;
-    padding: 0.7rem;
-    width: 100%;
-    background-color: #3498db;
+.formTopic button {
+    padding: 10px 15px;
+    background: #007bff;
+    color: #ffffff;
     border: none;
-    color: white;
-    font-weight: bold;
-    font-size: 1rem;
-    border-radius: 6px;
+    border-radius: 8px;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: background 0.2s ease-in-out;
 }
 
-button:hover {
-    background-color: #2980b9;
+.formTopic button:hover {
+    background: #0056b3;
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 20px;
+    }
+    .formTopic {
+        width: 100%;
+    }
 }

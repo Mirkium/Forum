@@ -1,20 +1,105 @@
+{{define "Profil"}}
 <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil</title>
+    <link rel="stylesheet" href="/assets/css/profil.css">
+    <link rel="stylesheet" href="/assets/css/header.css">
+    <link rel="stylesheet" href="/assets/css/footer.css">
+    <link rel="stylesheet" href="/assets/css/message.css">
+    <link rel="stylesheet" href="/assets/css/ListTopic.css">
+    
+</head>
+<body>
+    <header>
+        <a href="/forum/home" id="title">YForum</a>
+        <form action="/search" class="search">
+            <input type="text" placeholder="Search...">
+            <button type="submit">
+                <img src="data:image/svg+xml;utf8,&lt;svg fill=&quot;white&quot; height=&quot;16&quot; viewBox=&quot;0 0 24 24&quot; width=&quot;16&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;&lt;path d=&quot;M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 5L20.49 19l-5-5zm-6 0C8.01 14 6 11.99 6 9.5S8.01 5 10.5 5 15 7.01 15 9.5 12.99 14 10.5 14z&quot;/&gt;&lt;/svg&gt;" alt="">
+            </button>
 
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/profil.css">
-        <link rel="stylesheet" href="/assets/css/header.css">
-        <link rel="stylesheet" href="/assets/css/footer.css">
-        <link rel="stylesheet" href="/assets/css/message.css">
-    </head>
-    <body>
-        
-        
-        <script src="" async defer></script>
-    </body>
+        </form>
+        <div class="login">
+            {{if eq .Profil.IsConnect true}}
+                <a href="/logout" class="signIn">Logout</a>
+                <a href="/forum/user" class="profil">{{.Profil.Username}}</a>
+            {{else}}
+                <a href="/forum/connect" class="signIn">Connect</a>
+                <a href="/forum/user" class="profil">Profil</a>
+            {{end}}
+        </div>
+    </header>
+
+    
+    <main>
+    <div class="Topic">
+        <a href="/forum/topic/get_add">Create Topic</a>
+            {{if .Profil.IsConnect }}
+                    <section class="topicSubscribe">
+                        <h2>Subscribe</h2>
+                        {{range .Profil.TopicLike}}
+                            <a href="/forum/topic?id={{.Id}}" class="LienTopic"><p><strong>{{.Name}}</strong>/{{.Category}}</p><p>{{.Followers}}</p></a>
+                        {{end}}
+                    </section>
+                {{end}}
+                {{range .ListTopic}}
+                    <a href="/forum/topic?id={{.Id}}" class="LienTopic"><p><strong>{{.Name}}</strong>/{{.Category}}</p><p>{{.Followers}}</p></a>
+                {{end}}
+            </div>
+        <!-- Posts de l'utilisateur -->
+
+    <div class="threadProfil">
+        <section class="profileCard">
+            <h2>{{ .Profil.Username }}</h2>
+            <p><strong>Rôle :</strong> {{ .Profil.Role }}</p>
+            <p><strong>Banni :</strong> {{ if .Profil.Banned }}Oui{{ else }}Non{{ end }}</p>
+            <p><strong>Connecté :</strong> {{ if .Profil.IsConnect }}Oui{{ else }}Non{{ end }}</p>
+            <p><strong>Followers :</strong> {{ .Profil.Followers }}</p>
+            <p><strong>Follow :</strong> {{ if .Profil.IsFollow }}Oui{{ else }}Non{{ end }}</p>
+        </section>
+
+        <section class="sectionThreads">
+            <h2>Posts de {{ .Profil.Username }}</h2>
+            <div class="horizontalScroll">
+                {{ range .Profil.Post }}
+                <div class="Thread">
+                    <h2>{{ .Title }}</h2>
+                    <p>{{ .Description }}</p>
+                    <div class="option">
+                        <span class="nbLike">👍 {{ .NbLike }}</span>
+                        <span class="nbDislike">👎 {{ .NbDisLike }}</span>
+                    </div>
+                </div>
+                {{ else }}
+                <p>Aucun post trouvé.</p>
+                {{ end }}
+            </div>
+        </section>
+    
+        <!-- Threads Likés -->
+        <section class="sectionThreads">
+            <h2>Threads Likés</h2>
+            <div class="horizontalScroll">
+                {{ range .Profil.ThreadLike }}
+                <div class="Thread">
+                    <h2>{{ .Title }}</h2>
+                    <p>{{ .Description }}</p>
+                    <div class="option">
+                        <span class="nbLike">👍 {{ .NbLike }}</span>
+                        <span class="nbDislike">👎 {{ .NbDisLike }}</span>
+                    </div>
+                </div>
+                {{ else }}
+                <p>Aucun thread liké.</p>
+                {{ end }}
+            </div>
+        </section>
+    </div>
+</main>
+
+</body>
 </html>
+{{end}}

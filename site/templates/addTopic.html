@@ -8,7 +8,7 @@
         <title>YForum - topic/add</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="/assets/css/addTopic">
+        <link rel="stylesheet" href="/assets/css/addTopic.css">
         <link rel="stylesheet" href="/assets/css/header.css">
     </head>
     <body>
@@ -22,8 +22,13 @@
 
             </form>
             <div class="login">
-                <a href="/forum/connect" class="signIn">Connect</a>
-                <a href="/forum/user?id={{.IdProdil}}" class="profil">Profil</a>
+                {{if eq .Profil.IsConnect true}}
+                    <a href="/logout" class="signIn">Logout</a>
+                    <a href="/forum/user" class="profil">{{.Profil.Username}}</a>
+                {{else}}
+                    <a href="/forum/connect" class="signIn">Connect</a>
+                    <a href="/forum/user" class="profil">Profil</a>
+                {{end}}
             </div>
         </header>
         

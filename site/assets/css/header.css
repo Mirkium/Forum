@@ -9,8 +9,7 @@ header {
     justify-content: space-between;
     align-items: center;
     background-color: #212222;
-    padding-left: 1%;
-    padding-right: 1%;
+    width: 100%;
 }
 
 a {
@@ -25,6 +24,7 @@ a {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-fill-color: transparent;
+    padding-left: 1%;
 }
 
 .search {
@@ -63,6 +63,7 @@ a {
     display: flex;
     justify-content: space-between;
     gap: 10px;
+    margin-right: 1%;
 }
 
 .signIn {
@@ -90,6 +91,7 @@ a {
     background-color: #49494a;
     padding: 7px;
     text-align: center;
+    
 }
 
 .profil:hover {

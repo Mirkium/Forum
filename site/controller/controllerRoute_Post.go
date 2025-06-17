@@ -36,6 +36,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: true,
 		MaxAge:   3600,
 	})
+	UserConnect = *user
 	UserConnect.IsConnect = true
 	http.Redirect(w, r, "/forum/home", http.StatusSeeOther)
 }
@@ -130,27 +131,7 @@ func AddThread_Post(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func LikeThreadHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		threadIdStr := r.URL.Query().Get("threadId")
-		threadId, err := strconv.Atoi(threadIdStr)
-		if err != nil {
-			http.Error(w, "Invalid thread ID", http.StatusBadRequest)
-			return
-		}
 
-		userId := UserConnect.Id
-		liked := DB.CheckLike(userId, threadId)
-
-		if liked {
-			DB.RemoveLike(userId, threadId)
-		} else {
-			DB.AddLike(userId, threadId)
-		}
-
-		http.Redirect(w, r, fmt.Sprintf("/forum/topic?id=%d", UserConnect.Id), http.StatusSeeOther)
-	}
-}
 
 func FollowUser(w http.ResponseWriter, r *http.Request) {
 

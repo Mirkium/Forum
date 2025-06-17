@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"fmt"
 	models "server/models"
 	"time"
@@ -99,6 +100,47 @@ func RecupTopicByID(topicId int) (models.Topic, error) {
 	return topic, nil
 }
 
+func RecupTopicByThreadID(threadID int) (models.Topic, error) {
+	query := `
+		SELECT 
+			t.id, t.name, c.name AS category_name, t.followers
+		FROM threads th
+		JOIN topics t ON th.topic_id = t.id
+		JOIN categories c ON t.category_id = c.id
+		WHERE th.id = ?
+	`
+
+	var topic models.Topic
+	err := DbContext.QueryRow(query, threadID).Scan(
+		&topic.Id,
+		&topic.Name,
+		&topic.Category,
+		&topic.Followers,
+	)
+	if err != nil {
+		return models.Topic{}, fmt.Errorf("erreur récupération topic via threadID : %v", err)
+	}
+
+	return topic, nil
+}
+
+func RecupTopicByName(name string) (models.Topic, error) {
+	query := `
+		SELECT t.id, t.name, c.name AS category_name, t.followers
+		FROM topics t
+		JOIN categories c ON t.category_id = c.id
+		WHERE t.name = ?
+	`
+
+	var topic models.Topic
+	err := DbContext.QueryRow(query, name).Scan(&topic.Id, &topic.Name, &topic.Category, &topic.Followers)
+	if err != nil {
+		return models.Topic{}, fmt.Errorf("erreur récupération topic par nom : %v", err)
+	}
+
+	return topic, nil
+}
+
 // ------------------ récupération des threads ------------------
 func RecupThreadsByTopicID(topicId int, userId int) []models.Thread {
 	query := `
@@ -115,7 +157,7 @@ func RecupThreadsByTopicID(topicId int, userId int) []models.Thread {
 
 	rows, err := DbContext.Query(query, userId, topicId)
 	if err != nil {
-		fmt.Println("Erreur récupération des threads :", err.Error()) 
+		fmt.Println("Erreur récupération des threads :", err.Error())
 		return nil
 	}
 	defer rows.Close()
@@ -132,13 +174,13 @@ func RecupThreadsByTopicID(topicId int, userId int) []models.Thread {
 			&th.NameCreator, &th.NameTopic, &isLike,
 		)
 		if err != nil {
-			fmt.Println("Erreur scan thread :", err.Error()) 
+			fmt.Println("Erreur scan thread :", err.Error())
 			continue
 		}
 
 		parsedTime, err := time.Parse("2006-01-02 15:04:05", createdAtStr)
 		if err != nil {
-			fmt.Println("Erreur parse created_at :", err.Error()) 
+			fmt.Println("Erreur parse created_at :", err.Error())
 		} else {
 			duration := time.Since(parsedTime)
 			th.TimeCreate = fmt.Sprintf("%v ago", duration.Round(time.Minute))
@@ -179,13 +221,13 @@ func RecupAllThreadsByDateDesc() ([]models.Thread, error) {
 			&th.NameCreator, &th.NameTopic,
 		)
 		if err != nil {
-			fmt.Println("Erreur scan thread :", err.Error()) 
+			fmt.Println("Erreur scan thread :", err.Error())
 			continue
 		}
 
 		parsedTime, err := time.Parse("2006-01-02 15:04:05", createdAtStr)
 		if err != nil {
-			fmt.Println("Erreur parse created_at :", err.Error()) 
+			fmt.Println("Erreur parse created_at :", err.Error())
 		} else {
 			duration := time.Since(parsedTime)
 			th.TimeCreate = fmt.Sprintf("%v ago", duration.Round(time.Minute))
@@ -201,7 +243,121 @@ func RecupAllThreadsByDateDesc() ([]models.Thread, error) {
 	return threads, nil
 }
 
+func RecupThreadByID(threadID int) (models.Thread, error) {
+	query := `
+		SELECT 
+			t.id, t.name, t.description, t.content, t.nb_like, t.nb_dislike, t.created_at,
+			u.username, tp.name AS topic_name
+		FROM threads t
+		JOIN users u ON u.id = t.author_id
+		JOIN topics tp ON tp.id = t.topic_id
+		WHERE t.id = ?
+	`
 
+	var th models.Thread
+	var createdAtStr string
+
+	err := DbContext.QueryRow(query, threadID).Scan(
+		&th.Id, &th.Title, &th.Description, &th.Content,
+		&th.NbLike, &th.NbDisLike, &createdAtStr,
+		&th.NameCreator, &th.NameTopic,
+	)
+	if err != nil {
+		return models.Thread{}, fmt.Errorf("Erreur récupération thread (id=%d) : %v", threadID, err)
+	}
+
+	parsedTime, err := time.Parse("2006-01-02 15:04:05", createdAtStr)
+	if err != nil {
+		fmt.Println("Erreur parse created_at :", err.Error())
+	} else {
+		duration := time.Since(parsedTime)
+		th.TimeCreate = fmt.Sprintf("%v ago", duration.Round(time.Minute))
+	}
+
+	return th, nil
+}
+
+func RecupThreadsByUserID(userID int) ([]models.Thread, error) {
+	query := `
+		SELECT 
+			t.id, t.name, t.description, t.content, t.nb_like, t.nb_dislike, t.created_at,
+			u.username, tp.name AS topic_name
+		FROM threads t
+		JOIN users u ON u.id = t.author_id
+		JOIN topics tp ON tp.id = t.topic_id
+		WHERE t.author_id = ?
+		ORDER BY t.created_at DESC
+	`
+
+	rows, err := DbContext.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("Erreur lors de la récupération des threads par user : %v", err)
+	}
+	defer rows.Close()
+
+	var threads []models.Thread
+	for rows.Next() {
+		var th models.Thread
+		var createdAt string
+
+		err := rows.Scan(&th.Id, &th.Title, &th.Description, &th.Content, &th.NbLike, &th.NbDisLike, &createdAt, &th.NameCreator, &th.NameTopic)
+		if err != nil {
+			fmt.Println("Erreur scan thread :", err)
+			continue
+		}
+
+		parsed, err := time.Parse("2006-01-02 15:04:05", createdAt)
+		if err == nil {
+			th.TimeCreate = fmt.Sprintf("%v ago", time.Since(parsed).Round(time.Minute))
+		}
+
+		threads = append(threads, th)
+	}
+
+	return threads, nil
+}
+
+func RecupThreadsLikedByUser(userID int) ([]models.Thread, error) {
+	query := `
+		SELECT 
+			t.id, t.name, t.description, t.content, t.nb_like, t.nb_dislike, t.created_at,
+			u.username, tp.name AS topic_name
+		FROM thread_likes tl
+		JOIN threads t ON tl.thread_id = t.id
+		JOIN users u ON t.author_id = u.id
+		JOIN topics tp ON tp.id = t.topic_id
+		WHERE tl.user_id = ? AND tl.is_like = 1
+		ORDER BY t.created_at DESC
+	`
+
+	rows, err := DbContext.Query(query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("Erreur récupération threads likés : %v", err)
+	}
+	defer rows.Close()
+
+	var threads []models.Thread
+	for rows.Next() {
+		var th models.Thread
+		var createdAt string
+
+		err := rows.Scan(&th.Id, &th.Title, &th.Description, &th.Content, &th.NbLike, &th.NbDisLike, &createdAt, &th.NameCreator, &th.NameTopic)
+		if err != nil {
+			fmt.Println("Erreur scan thread liked :", err)
+			continue
+		}
+
+		parsed, err := time.Parse("2006-01-02 15:04:05", createdAt)
+		if err == nil {
+			th.TimeCreate = fmt.Sprintf("%v ago", time.Since(parsed).Round(time.Minute))
+		}
+
+		th.IsLike = true
+		threads = append(threads, th)
+	}
+
+	return threads, nil
+}
 
 // ------------------ récupération des tags ------------------
 
@@ -280,23 +436,63 @@ func RecupUserProfil(userId int) models.User {
 	return user
 }
 
-func CheckLike(userId, threadId int) bool {
-	query := `SELECT 1 FROM thread_likes WHERE user_id = ? AND thread_id = ? LIMIT 1`
-	var exist int
-	err := DbContext.QueryRow(query, userId, threadId).Scan(&exist)
-	return err == nil
+func CheckLike(userId, threadId int) (bool, bool, error) {
+	query := `SELECT is_like FROM thread_likes WHERE user_id = ? AND thread_id = ? LIMIT 1`
+
+	var isLike bool
+	err := DbContext.QueryRow(query, userId, threadId).Scan(&isLike)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, false, nil
+		}
+		return false, false, err
+	}
+	return true, isLike, nil
 }
 
 func AddLike(userId, threadId int) error {
-	_, err := DbContext.Exec("INSERT INTO thread_likes (user_id, thread_id, is_like) VALUES(?, ?, 1)", userId, threadId)
-	return err
+	tx, err := DbContext.Begin()
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("INSERT INTO thread_likes (user_id, thread_id, is_like) VALUES(?, ?, 1)", userId, threadId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("UPDATE threads SET nb_like = nb_like + 1 WHERE id = ?", threadId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
+
 }
 
 func RemoveLike(userId, threadId int) error {
-	_, err := DbContext.Exec("DELETE FROM thread_likes WHERE user_id = ? AND thread_id = ?", userId, threadId)
-	return err
-}
+	tx, err := DbContext.Begin()
+	if err != nil {
+		return err
+	}
 
+	_, err = tx.Exec("DELETE FROM thread_likes WHERE user_id = ? AND thread_id = ?", userId, threadId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	_, err = tx.Exec("UPDATE threads SET nb_like = nb_like - 1 WHERE id = ?", threadId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
+}
 
 // ------------------ Récupération utilisateur ------------------
 
@@ -410,8 +606,6 @@ func GetUserByUsername(username string) (models.User, error) {
 	return user, nil
 }
 
-
-
 func GetTopicByName(name string) (models.Topic, error) {
 	var topic models.Topic
 
@@ -428,6 +622,3 @@ func GetTopicByName(name string) (models.Topic, error) {
 
 	return topic, nil
 }
-
-
-

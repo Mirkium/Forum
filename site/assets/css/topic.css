@@ -1,0 +1,44 @@
+.optionTopic {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5%;
+    width: 50%;
+}
+
+.addPost {
+    background-color: rgb(167, 167, 167);
+    border: none;
+    border-radius: 20px;
+    color: black;
+    text-align: center;
+    text-decoration: none;
+    padding: 5px;
+}
+
+.addPost:hover {
+    background-color: rgba(201, 200, 200, 0.825);
+    cursor: pointer;
+}
+
+.nbFollowers {
+    color: black;
+}
+
+.follow {
+    align-self: flex-end;
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #FFD700, #FFA500);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.follow:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px -2px #FFD700;
+}
+

@@ -1,0 +1,176 @@
+body {
+    background: #edf5ff;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #333;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+main {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+.threadProfil {
+    display: flex; 
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+/* Carte principale profil */
+.profileCard {
+    background: #ffffff;
+    padding: 30px;
+    max-width: 700px;
+    width: 100%;
+    margin: 2%;
+    border-radius: 20px;
+    box-shadow: 0 15px 30px -3px rgba(0, 0, 0, 0.3);
+    font-size: 16px;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.profileCard h2 {
+    margin-bottom: 15px;
+    color: #007bff;
+    font-size: 24px;
+}
+
+.profileCard p {
+    margin: 8px 0;
+    color: #555;
+    font-size: 15px;
+}
+
+.profileCard p strong {
+    color: #000;
+}
+
+/* Section horizontale (scrollable) */
+.sectionThreads {
+    width: 100vw;
+    max-width: 1200px;
+    margin-top: 1%;
+    padding: 0 10px;
+    background-color: #fff;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sectionThreads h2 {
+    font-size: 1.4em;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.horizontalScroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
+}
+
+.Thread {
+    flex: 0 0 280px;
+    min-width: 260px;
+    max-width: 300px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.Thread:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.creator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.creator a {
+    color: #007bff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.creator a:hover {
+    color: #0056b3;
+}
+
+.Thread h2 {
+    font-size: 1.2em;
+    color: #222;
+    margin-bottom: 10px;
+}
+
+.Thread p {
+    font-size: 0.95em;
+    line-height: 1.4;
+    color: #444;
+    margin-bottom: 12px;
+}
+
+.option {
+    display: flex;
+    gap: 10px;
+    font-size: 0.9em;
+}
+
+.nbLike {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.nbDislike {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.Thread a {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.Thread a:hover {
+    color: #0056b3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .horizontalScroll {
+        flex-direction: column;
+        overflow-x: visible;
+    }
+
+    .Thread {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .profileCard {
+        padding: 20px;
+        margin: 0 10px 30px;
+    }
+
+    .sectionThreads {
+        padding: 0 10px;
+    }
+}
